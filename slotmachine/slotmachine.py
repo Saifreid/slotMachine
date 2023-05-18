@@ -32,23 +32,26 @@ def slotChecker(slotMachine, currentRow, currentColumn, checkNum):
 
 
 
-def playSlot(slotMachine, balance, betAmount):
-    populateSlot(slotMachine)
-    printSlotScreen(slotMachine)
-    if balance < betAmount or betAmount < 1:
-        print("Bet amount is greater than balance reenter a bet amount or less than 1")
+def playSlot(slotMachine, balance):
+    betAmount = 0
     while balance < betAmount or betAmount < 1:
         try:
             betAmount = int(input("Please enter new bet amount: "))
             if str(betAmount).__contains__("."):
                     print("Amount must be a whole number without a decimal")
                     betAmount = 0
+            if betAmount < 1:
+                    print("Bet amount is not high enough bet must be higher than 0 ")
+            if betAmount > balance:
+                    print("Bet amount exceeds total balance! ")
         except(ValueError, TypeError):
-            print("Invalid bet amount please enter a number greater than 0 but less than your balance Balance:", balance)
+            print("Invalid bet amount please enter a number greater than 0 but less than or equal to your balance Balance:", balance)
+    populateSlot(slotMachine)
+    printSlotScreen(slotMachine)
     for row in range(0,3):
         if slotChecker(slotMachine, row, 0, slotMachine[row][0]):
-            return True
-    return False    
+            return [True, betAmount]
+    return [False, betAmount]    
                 
                 
 """
@@ -66,25 +69,19 @@ while balance <= 0:
 print("Your Balance is", str(balance), " ")
 
 slotmachine = [[0, 2, 5, 6, 0 ],[3, 0, 3, 0, 3 ],[8, 6, 0, 3, 6 ]]
-print(slotmachine)
 play = True
-betAmount = 0
-while betAmount < 1:
-            try:
-                betAmount = int(input("Please enter a whole number amount to bet greater than 0: "))
-                if str(betAmount).__contains__("."):
-                    print("Amount must be a whole number without a decimal")
-                    betAmount = 0
-            except(TypeError, ValueError):
-                print("Please enter a valid whole number greater than 0")
 while play == True:
-    if playSlot(slotmachine, balance, betAmount):
-        balance += betAmount
+    playResults = ["",""]
+    playResults = playSlot(slotmachine, balance)
+    betAmount = playResults[1]
+    winresults = playResults[0]
+    if winresults:
         print("You win")
+        balance += (betAmount*5)
         print("New Balance: ", str(balance))
     else:
-        balance -= betAmount
         print("You lose")
+        balance -= betAmount
         print("New Balance: ", str(balance))
     playAgain = input("Do you wish to play again? y/n ").lower()
     while not playAgain == "n" and not playAgain == "no" and not playAgain == "yes" and not playAgain == "y":
@@ -92,13 +89,5 @@ while play == True:
     if playAgain == "n" or playAgain == "no":
         play = False
     if playAgain == "y" or playAgain == "yes":
-        betAmount = 0
-        while betAmount < 1:
-            try:
-                betAmount = int(input("Please enter amount to bet greater than 0: "))
-                if str(betAmount).__contains__("."):
-                    print("Amount must be a whole number without a decimal")
-                    betAmount = 0
-            except(TypeError, ValueError):
-                print("Please enter a valid number greater than 0")
+        play = True
 print("Thank you for playing")
